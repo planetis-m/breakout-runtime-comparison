@@ -1,4 +1,4 @@
-import std/[monotimes, random, strutils]
+import std/[monotimes, os, random, strutils]
 import ./bench_sizes
 
 when not compileOption("threads"):
@@ -36,7 +36,14 @@ proc benchmarkMain*[G](
   update: proc (game: var G; timings: var Timings),
   snapshot: proc (game: G): Snapshot
 ) =
-  for scale in BenchScales:
+  let requestedScale = getEnv("BENCH_SCALE")
+  let scales =
+    if requestedScale.len == 0:
+      @BenchScales
+    else:
+      @[findBenchScale(requestedScale)]
+
+  for scale in scales:
     let scaleLabel = label & " [" & scale.name & "]"
     var totalNs = 0'i64
     var totalTimings = Timings()

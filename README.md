@@ -30,8 +30,8 @@ Every implementation runs the same fixed simulation:
 - same high-level update order
 - same headless environment
 
-Each benchmark now reports total runtime, peak resident memory, and per-system
-timing buckets, so the
+Each benchmark now reports total runtime, per-size peak resident memory, and
+per-system timing buckets, so the
 suite can answer:
 
 - which architecture wins overall
@@ -44,7 +44,7 @@ Latest local run with the default suite configuration:
 
 - `--threads:on`
 - `-d:release`
-- `small=10x10`, `medium=20x15`, `large=30x20` brick grids
+- `small=10x10`, `medium=20x15`, `large=30x20`, `xlarge=40x25`, `xxlarge=50x30` brick grids
 - `2000` ticks per repetition
 - `5` repetitions
 
@@ -52,10 +52,10 @@ Latest local run with the default suite configuration:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `13.491ms` | `6745.378` |
-| `pooled-data-oriented` | `13.496ms` | `6748.132` |
-| `entity-component` | `14.593ms` | `7296.435` |
-| `archetype-ecs` | `18.661ms` | `9330.346` |
+| `signature-query-ecs` | `11.362ms` | `5680.767` |
+| `entity-component` | `12.330ms` | `6164.901` |
+| `pooled-data-oriented` | `12.952ms` | `6475.760` |
+| `archetype-ecs` | `17.718ms` | `8859.060` |
 
 Final normalized snapshot for `small`:
 
@@ -72,10 +72,10 @@ Final normalized snapshot for `small`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `27.858ms` | `13929.085` |
-| `pooled-data-oriented` | `31.502ms` | `15750.879` |
-| `entity-component` | `31.667ms` | `15833.620` |
-| `archetype-ecs` | `45.589ms` | `22794.280` |
+| `signature-query-ecs` | `30.709ms` | `15354.313` |
+| `pooled-data-oriented` | `32.743ms` | `16371.713` |
+| `entity-component` | `33.179ms` | `16589.544` |
+| `archetype-ecs` | `47.397ms` | `23698.413` |
 
 Final normalized snapshot for `medium`:
 
@@ -92,10 +92,10 @@ Final normalized snapshot for `medium`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `54.202ms` | `27100.796` |
-| `pooled-data-oriented` | `68.325ms` | `34162.402` |
-| `entity-component` | `68.868ms` | `34433.751` |
-| `archetype-ecs` | `93.422ms` | `46710.923` |
+| `signature-query-ecs` | `55.963ms` | `27981.581` |
+| `pooled-data-oriented` | `60.944ms` | `30472.087` |
+| `entity-component` | `67.857ms` | `33928.431` |
+| `archetype-ecs` | `95.768ms` | `47884.168` |
 
 Final normalized snapshot for `large`:
 
@@ -108,26 +108,78 @@ Final normalized snapshot for `large`:
 - `particle=0`
 - `trail=190`
 
+### Xlarge
+
+| Implementation | Avg total | Ns/tick |
+| --- | ---: | ---: |
+| `signature-query-ecs` | `100.872ms` | `50435.957` |
+| `pooled-data-oriented` | `118.228ms` | `59114.145` |
+| `entity-component` | `129.587ms` | `64793.734` |
+| `archetype-ecs` | `188.161ms` | `94080.258` |
+
+Final normalized snapshot for `xlarge` in `pooled-data-oriented`,
+`entity-component`, and `archetype-ecs`:
+
+- `live=939`
+- `total=939`
+- `max=2348`
+- `paddle=1`
+- `ball=13`
+- `brick=646`
+- `particle=32`
+- `trail=247`
+
+`signature-query-ecs` diverged at `xlarge` and ended with:
+
+- `live=890`
+- `total=890`
+- `max=2348`
+- `paddle=1`
+- `ball=12`
+- `brick=649`
+- `particle=0`
+- `trail=228`
+
+### Xxlarge
+
+| Implementation | Avg total | Ns/tick |
+| --- | ---: | ---: |
+| `signature-query-ecs` | `148.699ms` | `74349.383` |
+| `pooled-data-oriented` | `176.532ms` | `88266.227` |
+| `entity-component` | `195.506ms` | `97753.216` |
+| `archetype-ecs` | `275.663ms` | `137831.505` |
+
+Final normalized snapshot for `xxlarge`:
+
+- `live=1493`
+- `total=1493`
+- `max=2848`
+- `paddle=1`
+- `ball=12`
+- `brick=1124`
+- `particle=128`
+- `trail=228`
+
 ### Peak Resident Memory
 
-Peak RSS is measured once per executable over the full `small` -> `medium` ->
-`large` sweep:
+Peak RSS is measured separately for each size by running one benchmark scale per
+process:
 
-| Implementation | Peak RSS |
-| --- | ---: |
-| `pooled-data-oriented` | `2772KB` |
-| `entity-component` | `3600KB` |
-| `signature-query-ecs` | `3360KB` |
-| `archetype-ecs` | `6192KB` |
+| Implementation | Small | Medium | Large | Xlarge | Xxlarge |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `pooled-data-oriented` | `2532KB` | `2840KB` | `2776KB` | `3360KB` | `3548KB` |
+| `entity-component` | `2504KB` | `2964KB` | `3720KB` | `3608KB` | `4148KB` |
+| `signature-query-ecs` | `2704KB` | `2640KB` | `3084KB` | `3224KB` | `3164KB` |
+| `archetype-ecs` | `3416KB` | `3708KB` | `4348KB` | `4792KB` | `5232KB` |
 
 ### Per-System Highlights
 
-- `signature-query-ecs` stays in front at every tested size
-- `pooled-data-oriented` and `entity-component` remain close, with the gap still
-  smaller than the jump to `archetype-ecs`
+- `signature-query-ecs` stays in front at every tested size by raw runtime
+- `pooled-data-oriented` and `entity-component` remain close, with the gap still smaller than the jump to `archetype-ecs`
 - `transform2d` and `collide` dominate more of the total cost as the brick grid grows
 - `entity-component` still pays noticeably more in `cleanupDead` than the others
 - `archetype-ecs` is the most memory-hungry implementation in this run
+- `xlarge` is not currently fairness-clean because `signature-query-ecs` diverges from the other three on the final normalized snapshot
 
 These numbers are machine-dependent. Treat them as a benchmark snapshot for the
 current code in this repository, not as a universal claim about these
@@ -265,7 +317,7 @@ Each runner prints:
 - one line per repetition
 - average total runtime
 - nanoseconds per tick
-- peak resident memory for the whole benchmark process
+- peak resident memory for that benchmark size
 - normalized entity counts
 - per-system timing buckets
 
