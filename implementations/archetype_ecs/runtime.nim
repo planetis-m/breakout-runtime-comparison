@@ -769,39 +769,3 @@ proc sysMove*(game: var Game) =
   for actor in game.actors.items:
     if not actor.dead and game.entityArch(actor.entity) in {PaddleArch, BallArch, ParticleArch}:
       game.updateTransform(actor.entity)
-
-proc liveEntities*(game: Game): int =
-  result = 1 + game.actors.len
-
-proc ballCount*(game: Game): int =
-  result = 0
-  for actor in game.actors.items:
-    if not actor.dead and game.entityArch(actor.entity) == BallArch:
-      inc result
-
-proc brickCount*(game: Game): int =
-  result = 0
-  for actor in game.actors.items:
-    if not actor.dead and game.entityArch(actor.entity) == BrickArch:
-      inc result
-
-proc particleCount*(game: Game): int =
-  result = 0
-  for actor in game.actors.items:
-    if not actor.dead and game.entityArch(actor.entity) == ParticleArch:
-      inc result
-
-proc trailCount*(game: Game): int =
-  result = 0
-  for actor in game.actors.items:
-    if not actor.dead and game.entityArch(actor.entity) == TrailArch:
-      inc result
-
-proc debugTransform*(game: Game; entity: Entity): Transform2d =
-  result = componentPtr[Transform2d](game, entity, TransformC)[]
-
-proc debugMove*(game: Game; entity: Entity): Move =
-  result = componentPtr[Move](game, entity, MoveC)[]
-
-proc debugCollide*(game: Game; entity: Entity): Collide =
-  result = componentPtr[Collide](game, entity, CollideC)[]
