@@ -290,8 +290,28 @@ proc delete*(game: var Game, entity: Entity) =
     game.toDelete.add(entity)
   #else: game.toDelete.add(entity)
 
+proc clearEntityResources(world: var World, entity: Entity, signature: set[HasComponent]) =
+  if HasCollide in signature:
+    componentColumn[Collide](world, HasCollide)[entity.idx] = default(Collide)
+  if HasDraw2d in signature:
+    componentColumn[Draw2d](world, HasDraw2d)[entity.idx] = default(Draw2d)
+  if HasFade in signature:
+    componentColumn[Fade](world, HasFade)[entity.idx] = default(Fade)
+  if HasHierarchy in signature:
+    componentColumn[Hierarchy](world, HasHierarchy)[entity.idx] = default(Hierarchy)
+  if HasMove in signature:
+    componentColumn[Move](world, HasMove)[entity.idx] = default(Move)
+  if HasPrevious in signature:
+    componentColumn[Previous](world, HasPrevious)[entity.idx] = default(Previous)
+  if HasTransform2d in signature:
+    componentColumn[Transform2d](world, HasTransform2d)[entity.idx] = default(Transform2d)
+  if HasShake in signature:
+    componentColumn[Shake](world, HasShake)[0] = default(Shake)
+
 proc cleanup*(game: var Game) =
   for entity in game.toDelete.items:
+    let signature = game.world.signature[entity]
+    game.world.clearEntityResources(entity, signature)
     game.world.signature.del(entity)
   game.toDelete.shrink(0)
 

@@ -52,10 +52,10 @@ Latest local run with the default suite configuration:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `entity-component` | `11.104ms` | `5552.105` |
-| `signature-query-ecs` | `11.861ms` | `5930.341` |
-| `pooled-data-oriented` | `11.931ms` | `5965.526` |
-| `archetype-ecs` | `15.730ms` | `7864.753` |
+| `signature-query-ecs` | `10.527ms` | `5263.703` |
+| `entity-component` | `11.178ms` | `5589.041` |
+| `pooled-data-oriented` | `12.420ms` | `6210.175` |
+| `archetype-ecs` | `17.849ms` | `8924.382` |
 
 Final normalized snapshot for `small`:
 
@@ -72,10 +72,10 @@ Final normalized snapshot for `small`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `45.708ms` | `22853.781` |
-| `pooled-data-oriented` | `51.129ms` | `25564.675` |
-| `entity-component` | `60.852ms` | `30425.890` |
-| `archetype-ecs` | `79.949ms` | `39974.499` |
+| `signature-query-ecs` | `49.621ms` | `24810.588` |
+| `pooled-data-oriented` | `51.516ms` | `25758.226` |
+| `entity-component` | `63.619ms` | `31809.495` |
+| `archetype-ecs` | `83.781ms` | `41890.447` |
 
 Final normalized snapshot for `medium`:
 
@@ -92,10 +92,10 @@ Final normalized snapshot for `medium`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `87.791ms` | `43895.694` |
-| `pooled-data-oriented` | `116.442ms` | `58221.127` |
-| `entity-component` | `131.665ms` | `65832.663` |
-| `archetype-ecs` | `172.208ms` | `86104.161` |
+| `signature-query-ecs` | `87.408ms` | `43704.122` |
+| `pooled-data-oriented` | `112.125ms` | `56062.461` |
+| `entity-component` | `139.270ms` | `69635.009` |
+| `archetype-ecs` | `158.463ms` | `79231.543` |
 
 Final normalized snapshot for `large`:
 
@@ -112,10 +112,10 @@ Final normalized snapshot for `large`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `157.384ms` | `78691.768` |
-| `pooled-data-oriented` | `206.465ms` | `103232.560` |
-| `entity-component` | `222.301ms` | `111150.621` |
-| `archetype-ecs` | `310.580ms` | `155289.794` |
+| `signature-query-ecs` | `167.332ms` | `83665.927` |
+| `pooled-data-oriented` | `184.618ms` | `92308.879` |
+| `entity-component` | `228.131ms` | `114065.260` |
+| `archetype-ecs` | `301.969ms` | `150984.462` |
 
 Final normalized snapshot for `xlarge`:
 
@@ -132,10 +132,10 @@ Final normalized snapshot for `xlarge`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `221.914ms` | `110957.062` |
-| `pooled-data-oriented` | `319.176ms` | `159587.755` |
-| `entity-component` | `335.075ms` | `167537.511` |
-| `archetype-ecs` | `473.674ms` | `236836.877` |
+| `signature-query-ecs` | `252.221ms` | `126110.649` |
+| `pooled-data-oriented` | `289.398ms` | `144698.904` |
+| `entity-component` | `350.884ms` | `175442.222` |
+| `archetype-ecs` | `501.079ms` | `250539.344` |
 
 Final normalized snapshot for `xxlarge`:
 
@@ -155,14 +155,14 @@ process:
 
 | Implementation | Small | Medium | Large | Xlarge | Xxlarge |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `pooled-data-oriented` | `2700KB` | `4172KB` | `3416KB` | `4184KB` | `4212KB` |
-| `entity-component` | `2568KB` | `4420KB` | `4036KB` | `4932KB` | `4988KB` |
-| `signature-query-ecs` | `2796KB` | `3592KB` | `3468KB` | `3460KB` | `3596KB` |
-| `archetype-ecs` | `3100KB` | `7152KB` | `5672KB` | `6180KB` | `6920KB` |
+| `pooled-data-oriented` | `2704KB` | `4116KB` | `3472KB` | `4120KB` | `4236KB` |
+| `entity-component` | `2808KB` | `4640KB` | `4092KB` | `4992KB` | `4932KB` |
+| `signature-query-ecs` | `2696KB` | `3592KB` | `3588KB` | `3472KB` | `3396KB` |
+| `archetype-ecs` | `3336KB` | `7084KB` | `5600KB` | `6064KB` | `6756KB` |
 
 ### Per-System Highlights
 
-- `signature-query-ecs` stays in front from `medium` upward, while `entity-component` wins the current `small` run
+- `signature-query-ecs` is fastest in the current run at every tested size
 - `pooled-data-oriented` and `entity-component` remain closer to each other than to `archetype-ecs` at larger sizes
 - `transform2d` and `collide` dominate more of the total cost as the brick grid grows
 - `entity-component` still pays noticeably more in `cleanupDead` than the others
