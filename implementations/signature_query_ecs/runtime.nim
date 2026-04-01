@@ -5,7 +5,7 @@ import ../../shared/[headless_raylib, vmath]
 # ---- entities ----
 type
   Entity* = distinct EntityImpl
-  EntityImpl* = uint16
+  EntityImpl* = uint32
 
 const
   VersionBits = 3
@@ -13,6 +13,7 @@ const
   IndexMask = 1 shl IndexBits - 1
   InvalidId* = Entity(IndexMask) # a sentinel value to represent an invalid entity
   MaxEntities* = IndexMask
+  StorageCapacity = 65_536
 
 template idx*(e: Entity): int = e.int and IndexMask
 template version*(e: Entity): EntityImpl = e.EntityImpl shr IndexBits
@@ -66,8 +67,8 @@ proc contains*[T](x: SlotTable[T], e: Entity): bool =
       x.slots[e.idx].version == e.version
 
 proc incl*[T](x: var SlotTable[T], value: T): Entity =
-  if x.len + 1 == MaxEntities:
-    raise newException(RangeDefect, "SlotTable number of elements overflow")
+  if x.len + 1 == StorageCapacity:
+    raise newException(RangeDefect, "SlotTable storage capacity overflow")
   let idx = x.freeHead
   if idx < x.slots.len:
     template slot: untyped = x.slots[idx]
@@ -214,27 +215,27 @@ type
     raylib*: RaylibContext
 
 proc `=destroy`*(world: var World) =
-  freeColumn[Collide](world.columns[HasCollide], MaxEntities)
-  freeColumn[Draw2d](world.columns[HasDraw2d], MaxEntities)
-  freeColumn[Fade](world.columns[HasFade], MaxEntities)
-  freeColumn[Hierarchy](world.columns[HasHierarchy], MaxEntities)
-  freeColumn[Move](world.columns[HasMove], MaxEntities)
-  freeColumn[Previous](world.columns[HasPrevious], MaxEntities)
+  freeColumn[Collide](world.columns[HasCollide], StorageCapacity)
+  freeColumn[Draw2d](world.columns[HasDraw2d], StorageCapacity)
+  freeColumn[Fade](world.columns[HasFade], StorageCapacity)
+  freeColumn[Hierarchy](world.columns[HasHierarchy], StorageCapacity)
+  freeColumn[Move](world.columns[HasMove], StorageCapacity)
+  freeColumn[Previous](world.columns[HasPrevious], StorageCapacity)
   freeColumn[Shake](world.columns[HasShake], 1)
-  freeColumn[Transform2d](world.columns[HasTransform2d], MaxEntities)
+  freeColumn[Transform2d](world.columns[HasTransform2d], StorageCapacity)
 
 proc initWorld*(): World =
   result = World(
-    signature: initSlotTableOfCap[set[HasComponent]](MaxEntities)
+    signature: initSlotTableOfCap[set[HasComponent]](StorageCapacity)
   )
-  result.columns[HasCollide] = allocColumn[Collide](MaxEntities)
-  result.columns[HasDraw2d] = allocColumn[Draw2d](MaxEntities)
-  result.columns[HasFade] = allocColumn[Fade](MaxEntities)
-  result.columns[HasHierarchy] = allocColumn[Hierarchy](MaxEntities)
-  result.columns[HasMove] = allocColumn[Move](MaxEntities)
-  result.columns[HasPrevious] = allocColumn[Previous](MaxEntities)
+  result.columns[HasCollide] = allocColumn[Collide](StorageCapacity)
+  result.columns[HasDraw2d] = allocColumn[Draw2d](StorageCapacity)
+  result.columns[HasFade] = allocColumn[Fade](StorageCapacity)
+  result.columns[HasHierarchy] = allocColumn[Hierarchy](StorageCapacity)
+  result.columns[HasMove] = allocColumn[Move](StorageCapacity)
+  result.columns[HasPrevious] = allocColumn[Previous](StorageCapacity)
   result.columns[HasShake] = allocColumn[Shake](1)
-  result.columns[HasTransform2d] = allocColumn[Transform2d](MaxEntities)
+  result.columns[HasTransform2d] = allocColumn[Transform2d](StorageCapacity)
 
 proc componentColumn[T](world: World; has: static[HasComponent]): ptr UncheckedArray[T] {.inline.} =
   cast[ptr UncheckedArray[T]](world.columns[has])

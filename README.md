@@ -44,7 +44,7 @@ Latest local run with the default suite configuration:
 
 - `--threads:on`
 - `-d:release`
-- `small=10x10`, `medium=20x15`, `large=30x20`, `xlarge=40x25`, `xxlarge=50x30` brick grids
+- `small=20x15`, `medium=30x20`, `large=40x30`, `xlarge=50x40`, `xxlarge=60x50` brick grids
 - `2000` ticks per repetition
 - `5` repetitions
 
@@ -52,32 +52,12 @@ Latest local run with the default suite configuration:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `entity-component` | `11.188ms` | `5593.880` |
-| `signature-query-ecs` | `11.317ms` | `5658.341` |
-| `pooled-data-oriented` | `12.852ms` | `6425.923` |
-| `archetype-ecs` | `17.035ms` | `8517.273` |
+| `pooled-data-oriented` | `51.225ms` | `25612.414` |
+| `signature-query-ecs` | `51.453ms` | `25726.391` |
+| `entity-component` | `64.940ms` | `32470.090` |
+| `archetype-ecs` | `78.701ms` | `39350.586` |
 
 Final normalized snapshot for `small`:
-
-- `live=96`
-- `total=96`
-- `max=728`
-- `paddle=1`
-- `ball=2`
-- `brick=23`
-- `particle=32`
-- `trail=38`
-
-### Medium
-
-| Implementation | Avg total | Ns/tick |
-| --- | ---: | ---: |
-| `pooled-data-oriented` | `48.049ms` | `24024.390` |
-| `signature-query-ecs` | `50.506ms` | `25253.042` |
-| `entity-component` | `68.688ms` | `34344.204` |
-| `archetype-ecs` | `81.973ms` | `40986.389` |
-
-Final normalized snapshot for `medium`:
 
 - `live=593`
 - `total=593`
@@ -88,16 +68,16 @@ Final normalized snapshot for `medium`:
 - `particle=224`
 - `trail=266`
 
-### Large
+### Medium
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `88.549ms` | `44274.452` |
-| `pooled-data-oriented` | `115.284ms` | `57641.757` |
-| `entity-component` | `134.143ms` | `67071.656` |
-| `archetype-ecs` | `164.855ms` | `82427.591` |
+| `signature-query-ecs` | `87.540ms` | `43770.102` |
+| `pooled-data-oriented` | `111.859ms` | `55929.694` |
+| `entity-component` | `134.969ms` | `67484.423` |
+| `archetype-ecs` | `183.646ms` | `91822.955` |
 
-Final normalized snapshot for `large`:
+Final normalized snapshot for `medium`:
 
 - `live=793`
 - `total=793`
@@ -108,43 +88,63 @@ Final normalized snapshot for `large`:
 - `particle=96`
 - `trail=361`
 
+### Large
+
+| Implementation | Avg total | Ns/tick |
+| --- | ---: | ---: |
+| `signature-query-ecs` | `198.611ms` | `99305.367` |
+| `pooled-data-oriented` | `255.016ms` | `127508.247` |
+| `entity-component` | `304.912ms` | `152456.059` |
+| `archetype-ecs` | `396.528ms` | `198263.831` |
+
+Final normalized snapshot for `large`:
+
+- `live=1458`
+- `total=1458`
+- `max=4402`
+- `paddle=1`
+- `ball=27`
+- `brick=821`
+- `particle=96`
+- `trail=513`
+
 ### Xlarge
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `160.623ms` | `80311.690` |
-| `pooled-data-oriented` | `197.744ms` | `98872.197` |
-| `entity-component` | `226.661ms` | `113330.709` |
-| `archetype-ecs` | `313.931ms` | `156965.516` |
+| `signature-query-ecs` | `299.262ms` | `149631.006` |
+| `pooled-data-oriented` | `401.334ms` | `200666.891` |
+| `entity-component` | `414.899ms` | `207449.727` |
+| `archetype-ecs` | `701.989ms` | `350994.705` |
 
 Final normalized snapshot for `xlarge`:
 
-- `live=1238`
-- `total=1238`
-- `max=4202`
+- `live=2258`
+- `total=2258`
+- `max=5202`
 - `paddle=1`
 - `ball=25`
-- `brick=641`
+- `brick=1621`
 - `particle=96`
-- `trail=475`
+- `trail=513`
 
 ### Xxlarge
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `245.269ms` | `122634.522` |
-| `pooled-data-oriented` | `287.037ms` | `143518.454` |
-| `entity-component` | `354.660ms` | `177329.889` |
-| `archetype-ecs` | `475.554ms` | `237776.818` |
+| `signature-query-ecs` | `427.762ms` | `213881.131` |
+| `pooled-data-oriented` | `571.237ms` | `285618.291` |
+| `entity-component` | `626.676ms` | `313338.203` |
+| `archetype-ecs` | `973.466ms` | `486732.909` |
 
 Final normalized snapshot for `xxlarge`:
 
-- `live=1758`
-- `total=1758`
-- `max=4702`
+- `live=3258`
+- `total=3258`
+- `max=6202`
 - `paddle=1`
 - `ball=27`
-- `brick=1121`
+- `brick=2621`
 - `particle=96`
 - `trail=513`
 
@@ -155,14 +155,14 @@ process:
 
 | Implementation | Small | Medium | Large | Xlarge | Xxlarge |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `pooled-data-oriented` | `2652KB` | `4084KB` | `3596KB` | `4184KB` | `4184KB` |
-| `entity-component` | `2692KB` | `4356KB` | `3976KB` | `4868KB` | `4868KB` |
-| `signature-query-ecs` | `2640KB` | `3396KB` | `3468KB` | `3344KB` | `3716KB` |
-| `archetype-ecs` | `3236KB` | `7176KB` | `5612KB` | `6060KB` | `6920KB` |
+| `pooled-data-oriented` | `4044KB` | `3572KB` | `4300KB` | `4056KB` | `4636KB` |
+| `entity-component` | `4536KB` | `4088KB` | `4864KB` | `6200KB` | `6328KB` |
+| `signature-query-ecs` | `4364KB` | `4076KB` | `4368KB` | `4752KB` | `5508KB` |
+| `archetype-ecs` | `7148KB` | `5408KB` | `6444KB` | `7072KB` | `8224KB` |
 
 ### Per-System Highlights
 
-- `entity-component` wins the current `small` run, while `signature-query-ecs` stays fastest from `large` upward
+- `pooled-data-oriented` narrowly wins the current `small` run, but `signature-query-ecs` is fastest from `medium` upward
 - `pooled-data-oriented` and `entity-component` remain closer to each other than to `archetype-ecs` at larger sizes
 - `transform2d` and `collide` dominate more of the total cost as the brick grid grows
 - `entity-component` still pays noticeably more in `cleanupDead` than the others
