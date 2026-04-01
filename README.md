@@ -35,6 +35,46 @@ suite can answer:
 - which architecture wins overall
 - where each architecture spends time
 
+## Current Results
+
+Latest local run with the default suite configuration:
+
+- `--threads:on`
+- `-d:release`
+- `2000` ticks per repetition
+- `5` repetitions
+
+### Ranking
+
+| Implementation | Avg total | Ns/tick |
+| --- | ---: | ---: |
+| `signature-query-ecs` | `11.577ms` | `5788.595` |
+| `pooled-data-oriented` | `12.638ms` | `6319.145` |
+| `entity-component` | `14.005ms` | `7002.360` |
+| `archetype-ecs` | `18.509ms` | `9254.591` |
+
+All four runs ended with the same normalized snapshot:
+
+- `live=81`
+- `total=81`
+- `max=693`
+- `paddle=1`
+- `ball=4`
+- `brick=0`
+- `particle=0`
+- `trail=76`
+
+### Per-System Highlights
+
+- `transform2d` is the largest bucket in every implementation
+- `archetype-ecs` is currently hurt most by `transform2d`, `fade`, and `collide`
+- `entity-component` pays noticeably more in `cleanupDead` than the others
+- `signature-query-ecs` is currently the fastest overall in this suite revision
+
+These numbers are machine-dependent. Treat them as a benchmark snapshot for the
+current code in this repository, not as a universal claim about these
+architectures.
+
 ## Implementations
 
 ### `pooled-data-oriented`
