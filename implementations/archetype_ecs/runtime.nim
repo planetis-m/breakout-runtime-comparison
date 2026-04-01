@@ -176,8 +176,6 @@ proc add[T](x: var DenseVec[T]; value: sink T) {.inline.} =
 
 proc removeAt[T](x: var DenseVec[T]; idx: int32) {.inline.} =
   let last = x.len - 1
-  when not supportsCopyMem(T):
-    `=destroy`(x.data[idx])
   if idx != last:
     x.data[idx] = move(x.data[last])
   dec x.len
