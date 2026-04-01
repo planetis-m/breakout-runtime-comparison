@@ -48,10 +48,10 @@ Latest local run with the default suite configuration:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `11.577ms` | `5788.595` |
-| `pooled-data-oriented` | `12.638ms` | `6319.145` |
-| `entity-component` | `14.005ms` | `7002.360` |
-| `archetype-ecs` | `18.509ms` | `9254.591` |
+| `signature-query-ecs` | `12.209ms` | `6104.426` |
+| `pooled-data-oriented` | `13.480ms` | `6739.781` |
+| `entity-component` | `14.197ms` | `7098.571` |
+| `archetype-ecs` | `18.484ms` | `9241.864` |
 
 All four runs ended with the same normalized snapshot:
 
@@ -68,8 +68,8 @@ All four runs ended with the same normalized snapshot:
 
 - `transform2d` is the largest bucket in every implementation
 - `archetype-ecs` is currently hurt most by `transform2d`, `fade`, and `collide`
-- `entity-component` pays noticeably more in `cleanupDead` than the others
-- `signature-query-ecs` is currently the fastest overall in this suite revision
+- `entity-component` still pays noticeably more in `cleanupDead` than the others
+- `signature-query-ecs` is currently the fastest overall in this measurement set
 
 These numbers are machine-dependent. Treat them as a benchmark snapshot for the
 current code in this repository, not as a universal claim about these

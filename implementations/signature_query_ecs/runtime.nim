@@ -134,6 +134,9 @@ type
   Input* = enum
     Right, Left
 
+  CollisionFlag* = enum
+    Hit
+
   HasComponent* = enum
     HasCollide,
     HasControlBall,
@@ -150,7 +153,7 @@ type
     HasTransform2d
 
   Collision* = object
-    other*: Entity
+    flags*: set[CollisionFlag]
     hit*: Vec2
 
   Collide* = object
@@ -300,8 +303,10 @@ template mixBody(has) =
 
 proc mixCollide*(world: var World, entity: Entity, size = vec2(0, 0)) =
   mixBody HasCollide
-  componentColumn[Collide](world, HasCollide)[entity.idx] = Collide(size: size,
-      collision: Collision(other: InvalidId))
+  componentColumn[Collide](world, HasCollide)[entity.idx] = Collide(
+    size: size,
+    collision: Collision(flags: {}, hit: vec2(0, 0))
+  )
 
 proc mixControlBall*(world: var World, entity: Entity) =
   mixBody HasControlBall
@@ -470,13 +475,11 @@ proc updateCollision(game: var Game, colliderId, otherId: Entity) =
 
   if intersectAabb(collider, other):
     let hit = penetrateAabb(collider, other)
-    collider.collision = Collision(other: otherId, hit: hit)
-    other.collision = Collision(other: colliderId, hit: -hit)
+    collider.collision = Collision(flags: {Hit}, hit: hit)
+    other.collision = Collision(flags: {Hit}, hit: -hit)
 
 proc sysCollide*(game: var Game) =
   var paddle = InvalidId
-  var balls: seq[Entity] = @[]
-  var bricks: seq[Entity] = @[]
 
   for colliderId, signature in game.world.signature.pairs:
     if ColliderQuery <= signature:
@@ -485,20 +488,18 @@ proc sysCollide*(game: var Game) =
       template collider: untyped =
         componentColumn[Collide](game.world, HasCollide)[colliderId.idx]
 
-      collider.collision.other = InvalidId
+      collider.collision = Collision(flags: {}, hit: vec2(0, 0))
       computeAabb(transform, collider)
       if PaddleQuery <= signature:
         paddle = colliderId
-      elif BallQuery <= signature:
-        balls.add(colliderId)
-      elif BrickQuery <= signature:
-        bricks.add(colliderId)
 
-  for ball in balls.items:
-    if paddle != InvalidId:
-      game.updateCollision(ball, paddle)
-    for brick in bricks.items:
-      game.updateCollision(ball, brick)
+  for ballId, ballSignature in game.world.signature.pairs:
+    if BallQuery <= ballSignature:
+      if paddle != InvalidId:
+        game.updateCollision(ballId, paddle)
+      for brickId, brickSignature in game.world.signature.pairs:
+        if BrickQuery <= brickSignature:
+          game.updateCollision(ballId, brickId)
 
 # ---- temp/breakout/systems/controlball.nim ----
 
@@ -526,7 +527,7 @@ proc updateControlBall(game: var Game, entity: Entity) =
     transform.translation.y = game.windowHeight.float32 - collide.size.y / 2
     move.direction.y *= -1
 
-  if collide.collision.other != InvalidId:
+  if Hit in collide.collision.flags:
     let collision = collide.collision
     if HasShake in game.world.signature[game.camera]:
       template cameraShake: untyped = componentColumn[Shake](game.world, HasShake)[0]
@@ -559,7 +560,7 @@ proc updateControlBrick(game: var Game, entity: Entity) =
   template collide: untyped = componentColumn[Collide](game.world, HasCollide)[entity.idx]
   template fade: untyped = componentColumn[Fade](game.world, HasFade)[entity.idx]
 
-  if collide.collision.other != InvalidId:
+  if Hit in collide.collision.flags:
     fade.step = 0.05
 
     if rand(1.0) > 0.98:
