@@ -1,4 +1,5 @@
 import std/[monotimes, random, strutils]
+import ./bench_sizes
 
 when not compileOption("threads"):
   {.error: "breakout-runtime-comparison must be built with --threads:on".}
@@ -30,76 +31,81 @@ template timeInto*(slot: untyped; body: untyped) =
 proc benchmarkMain*[G](
   label: string,
   initBenchGame: proc (): G,
-  createScene: proc (game: var G),
+  createScene: proc (game: var G; scale: BenchScale),
   applyInput: proc (game: var G; tick: int),
   update: proc (game: var G; timings: var Timings),
   snapshot: proc (game: G): Snapshot
 ) =
-  var totalNs = 0'i64
-  var totalTimings = Timings()
-  var lastSnapshot = Snapshot()
+  for scale in BenchScales:
+    let scaleLabel = label & " [" & scale.name & "]"
+    var totalNs = 0'i64
+    var totalTimings = Timings()
+    var lastSnapshot = Snapshot()
 
-  for rep in 0..<Repetitions:
-    randomize(12345)
-    var game = initBenchGame()
-    createScene(game)
-    var timings = Timings()
-    var peak = snapshot(game)
-    let start = getMonoTime().ticks
+    echo scaleLabel, " setup: bricks=", scale.columns * scale.rows,
+      " grid=", scale.columns, "x", scale.rows
 
-    for tick in 0..<TickCount:
-      applyInput(game, tick)
-      update(game, timings)
-      let current = snapshot(game)
-      if current.total > peak.max:
-        peak.max = current.total
+    for rep in 0..<Repetitions:
+      randomize(12345)
+      var game = initBenchGame()
+      createScene(game, scale)
+      var timings = Timings()
+      var peak = snapshot(game)
+      let start = getMonoTime().ticks
 
-    let elapsedNs = getMonoTime().ticks - start
-    var finalSnapshot = snapshot(game)
-    finalSnapshot.max = peak.max
-    lastSnapshot = finalSnapshot
-    totalNs += elapsedNs
-    totalTimings.controlBall += timings.controlBall
-    totalTimings.controlBrick += timings.controlBrick
-    totalTimings.controlPaddle += timings.controlPaddle
-    totalTimings.shake += timings.shake
-    totalTimings.fade += timings.fade
-    totalTimings.cleanupDead += timings.cleanupDead
-    totalTimings.move += timings.move
-    totalTimings.transform2d += timings.transform2d
-    totalTimings.collide += timings.collide
-    echo label, " rep ", rep + 1, ": ",
-      formatFloat(elapsedNs.float64 / 1_000_000.0, ffDecimal, 3), "ms"
+      for tick in 0..<TickCount:
+        applyInput(game, tick)
+        update(game, timings)
+        let current = snapshot(game)
+        if current.total > peak.max:
+          peak.max = current.total
 
-  let avgNs = totalNs div Repetitions
-  echo label, " avg: ",
-    formatFloat(avgNs.float64 / 1_000_000.0, ffDecimal, 3),
-    "ms total, ",
-    formatFloat(avgNs.float64 / TickCount.float64, ffDecimal, 3),
-    "ns/tick"
-  echo label, " entities: live=", lastSnapshot.live, " total=",
-    lastSnapshot.total, " max=", lastSnapshot.max
-  echo label, " kinds: paddle=", lastSnapshot.paddle, " ball=",
-    lastSnapshot.ball, " brick=", lastSnapshot.brick, " particle=",
-    lastSnapshot.particle, " trail=", lastSnapshot.trail, " dead=",
-    lastSnapshot.dead
-  if lastSnapshot.extra.len > 0:
-    echo label, " extra: ", lastSnapshot.extra
-  echo label, " sys controlBall=",
-    formatFloat((totalTimings.controlBall div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
-  echo label, " sys controlBrick=",
-    formatFloat((totalTimings.controlBrick div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
-  echo label, " sys controlPaddle=",
-    formatFloat((totalTimings.controlPaddle div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
-  echo label, " sys shake=",
-    formatFloat((totalTimings.shake div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
-  echo label, " sys fade=",
-    formatFloat((totalTimings.fade div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
-  echo label, " sys cleanupDead=",
-    formatFloat((totalTimings.cleanupDead div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
-  echo label, " sys move=",
-    formatFloat((totalTimings.move div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
-  echo label, " sys transform2d=",
-    formatFloat((totalTimings.transform2d div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
-  echo label, " sys collide=",
-    formatFloat((totalTimings.collide div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
+      let elapsedNs = getMonoTime().ticks - start
+      var finalSnapshot = snapshot(game)
+      finalSnapshot.max = peak.max
+      lastSnapshot = finalSnapshot
+      totalNs += elapsedNs
+      totalTimings.controlBall += timings.controlBall
+      totalTimings.controlBrick += timings.controlBrick
+      totalTimings.controlPaddle += timings.controlPaddle
+      totalTimings.shake += timings.shake
+      totalTimings.fade += timings.fade
+      totalTimings.cleanupDead += timings.cleanupDead
+      totalTimings.move += timings.move
+      totalTimings.transform2d += timings.transform2d
+      totalTimings.collide += timings.collide
+      echo scaleLabel, " rep ", rep + 1, ": ",
+        formatFloat(elapsedNs.float64 / 1_000_000.0, ffDecimal, 3), "ms"
+
+    let avgNs = totalNs div Repetitions
+    echo scaleLabel, " avg: ",
+      formatFloat(avgNs.float64 / 1_000_000.0, ffDecimal, 3),
+      "ms total, ",
+      formatFloat(avgNs.float64 / TickCount.float64, ffDecimal, 3),
+      "ns/tick"
+    echo scaleLabel, " entities: live=", lastSnapshot.live, " total=",
+      lastSnapshot.total, " max=", lastSnapshot.max
+    echo scaleLabel, " kinds: paddle=", lastSnapshot.paddle, " ball=",
+      lastSnapshot.ball, " brick=", lastSnapshot.brick, " particle=",
+      lastSnapshot.particle, " trail=", lastSnapshot.trail, " dead=",
+      lastSnapshot.dead
+    if lastSnapshot.extra.len > 0:
+      echo scaleLabel, " extra: ", lastSnapshot.extra
+    echo scaleLabel, " sys controlBall=",
+      formatFloat((totalTimings.controlBall div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
+    echo scaleLabel, " sys controlBrick=",
+      formatFloat((totalTimings.controlBrick div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
+    echo scaleLabel, " sys controlPaddle=",
+      formatFloat((totalTimings.controlPaddle div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
+    echo scaleLabel, " sys shake=",
+      formatFloat((totalTimings.shake div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
+    echo scaleLabel, " sys fade=",
+      formatFloat((totalTimings.fade div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
+    echo scaleLabel, " sys cleanupDead=",
+      formatFloat((totalTimings.cleanupDead div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
+    echo scaleLabel, " sys move=",
+      formatFloat((totalTimings.move div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
+    echo scaleLabel, " sys transform2d=",
+      formatFloat((totalTimings.transform2d div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"
+    echo scaleLabel, " sys collide=",
+      formatFloat((totalTimings.collide div Repetitions).float64 / 1_000_000.0, ffDecimal, 3), "ms"

@@ -1,5 +1,6 @@
 import std/[math, random]
 from typetraits import supportsCopyMem
+import ../../bench_sizes
 import ../../shared/[headless_raylib, vmath]
 # ---- archetype ecs runtime ----
 
@@ -495,10 +496,10 @@ proc createTrail*(game: var Game; x, y: float32) =
 proc createPaddle*(game: var Game; x, y: float32) =
   game.paddle = game.addPaddleEntity(vec2(x, y))
 
-proc createScene*(game: var Game) =
+proc createScene*(game: var Game; scale: BenchScale) =
   game.ensureInit()
-  let columnCount = 10
-  let rowCount = 10
+  let columnCount = scale.columns
+  let rowCount = scale.rows
   let brickWidth = 50
   let brickHeight = 15
   let margin = 5

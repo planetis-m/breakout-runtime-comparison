@@ -1,4 +1,5 @@
 import std/[math, random]
+import ../../bench_sizes
 import ../../shared/[headless_raylib, vmath]
 # ---- entity-component runtime ----
 
@@ -184,9 +185,9 @@ proc createPaddle*(game: var Game; x, y: float32) =
   entity.move = MoveComponent(direction: vec2(0, 0), speed: 20)
   game.paddle = entity
 
-proc createScene*(game: var Game) =
-  let columnCount = 10
-  let rowCount = 10
+proc createScene*(game: var Game; scale: BenchScale) =
+  let columnCount = scale.columns
+  let rowCount = scale.rows
   let brickWidth = 50
   let brickHeight = 15
   let margin = 5
