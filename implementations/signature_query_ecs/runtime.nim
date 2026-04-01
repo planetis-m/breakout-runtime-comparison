@@ -1,4 +1,5 @@
-import std/[math, random]
+import std/math
+import ../../bench_random
 import ../../bench_sizes
 import ../../shared/[headless_raylib, vmath]
 # ---- entities ----
@@ -371,8 +372,8 @@ proc mixTransform2d*(world: var World, entity: Entity; trworld = mat2d();
 
 # ---- blueprints ----
 
-proc createBall*(world: var World, parent: Entity, x, y: float32): Entity =
-  let angle = Pi.float32 + rand(1.0'f32) * Pi.float32
+proc createBall*(world: var World, parent: Entity, x, y: float32; seed: uint32): Entity =
+  let angle = angleFromSeed(seed)
   let entity = createEntity(world)
   mixTransform2d(world, entity, mat2d(), Vec2(x: x, y: y), Rad(0), vec2(1, 1), parent)
   mixCollide(world, entity, Vec2(x: 20.0, y: 20.0))
@@ -433,7 +434,13 @@ proc createScene*(game: var Game; scale: BenchScale) =
   mixTransform2d(game.world, camera, mat2d(), vec2(0, 0), Rad(0), vec2(1, 1), InvalidId)
   mixShake(game.world, camera, 0, 10)
   discard createPaddle(game.world, camera, float32(game.windowWidth / 2), float32(game.windowHeight - 30))
-  discard createBall(game.world, camera, float32(game.windowWidth / 2), float32(game.windowHeight - 60))
+  discard createBall(
+    game.world,
+    camera,
+    float32(game.windowWidth / 2),
+    float32(game.windowHeight - 60),
+    eventSeed(1'u32, 0, float32(game.windowWidth / 2), float32(game.windowHeight - 60))
+  )
   for row in 0 ..< rowCount:
     let y = startingY + row * (brickHeight + margin) + brickHeight div 2
     for col in 0 ..< columnCount:
@@ -555,18 +562,24 @@ proc sysControlBall*(game: var Game) =
 
 # ---- temp/breakout/systems/controlbrick.nim ----
 
-const ControlBrickQuery = {HasControlBrick, HasCollide, HasFade}
+const ControlBrickQuery = {HasControlBrick, HasCollide, HasFade, HasTransform2d}
 
 proc updateControlBrick(game: var Game, entity: Entity) =
   template collide: untyped = componentColumn[Collide](game.world, HasCollide)[entity.idx]
   template fade: untyped = componentColumn[Fade](game.world, HasFade)[entity.idx]
+  template transform: untyped =
+    componentColumn[Transform2d](game.world, HasTransform2d)[entity.idx]
 
   if Hit in collide.collision.flags:
     fade.step = 0.05
-
-    if rand(1.0) > 0.98:
-      discard game.world.createBall(game.camera, float32(game.windowWidth / 2),
-            float32(game.windowHeight / 2))
+    let spawnSeed = eventSeed(2'u32, game.tickId, transform.translation.x, transform.translation.y)
+    if chanceFromSeed(spawnSeed) > 0.98:
+      discard game.world.createBall(
+        game.camera,
+        float32(game.windowWidth / 2),
+        float32(game.windowHeight / 2),
+        spawnSeed
+      )
 
 proc sysControlBrick*(game: var Game) =
   for entity, signature in game.world.signature.pairs:
@@ -650,12 +663,12 @@ proc updateShake(game: var Game, entity: Entity) =
 
   if shake.duration > 0:
     shake.duration -= 0.01
-    transform.translation.x = shake.strength - rand(shake.strength * 2)
-    transform.translation.y = shake.strength - rand(shake.strength * 2)
+    transform.translation.x = shakeOffsetFromTick(game.tickId, 0, shake.strength)
+    transform.translation.y = shakeOffsetFromTick(game.tickId, 1, shake.strength)
 
-    game.clearColor[0] = rand(255).uint8
-    game.clearColor[1] = rand(255).uint8
-    game.clearColor[2] = rand(255).uint8
+    game.clearColor[0] = shakeColorFromTick(game.tickId, 0)
+    game.clearColor[1] = shakeColorFromTick(game.tickId, 1)
+    game.clearColor[2] = shakeColorFromTick(game.tickId, 2)
 
     game.world.mixDirty(entity)
 

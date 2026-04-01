@@ -24,7 +24,7 @@ Every implementation runs the same fixed simulation:
 
 - same scene setup
 - same scripted input
-- same RNG seed policy
+- same deterministic event-derived randomness
 - same tick count
 - same benchmark size set
 - same high-level update order
@@ -52,113 +52,101 @@ Latest local run with the default suite configuration:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `11.362ms` | `5680.767` |
-| `entity-component` | `12.330ms` | `6164.901` |
-| `pooled-data-oriented` | `12.952ms` | `6475.760` |
-| `archetype-ecs` | `17.718ms` | `8859.060` |
+| `entity-component` | `11.104ms` | `5552.105` |
+| `signature-query-ecs` | `11.861ms` | `5930.341` |
+| `pooled-data-oriented` | `11.931ms` | `5965.526` |
+| `archetype-ecs` | `15.730ms` | `7864.753` |
 
 Final normalized snapshot for `small`:
 
-- `live=81`
-- `total=81`
-- `max=693`
+- `live=96`
+- `total=96`
+- `max=728`
 - `paddle=1`
-- `ball=4`
-- `brick=0`
-- `particle=0`
-- `trail=76`
+- `ball=2`
+- `brick=23`
+- `particle=32`
+- `trail=38`
 
 ### Medium
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `30.709ms` | `15354.313` |
-| `pooled-data-oriented` | `32.743ms` | `16371.713` |
-| `entity-component` | `33.179ms` | `16589.544` |
-| `archetype-ecs` | `47.397ms` | `23698.413` |
+| `signature-query-ecs` | `45.708ms` | `22853.781` |
+| `pooled-data-oriented` | `51.129ms` | `25564.675` |
+| `entity-component` | `60.852ms` | `30425.890` |
+| `archetype-ecs` | `79.949ms` | `39974.499` |
 
 Final normalized snapshot for `medium`:
 
-- `live=349`
-- `total=349`
-- `max=1194`
+- `live=593`
+- `total=593`
+- `max=4482`
 - `paddle=1`
-- `ball=9`
-- `brick=104`
-- `particle=64`
-- `trail=171`
+- `ball=14`
+- `brick=88`
+- `particle=224`
+- `trail=266`
 
 ### Large
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `55.963ms` | `27981.581` |
-| `pooled-data-oriented` | `60.944ms` | `30472.087` |
-| `entity-component` | `67.857ms` | `33928.431` |
-| `archetype-ecs` | `95.768ms` | `47884.168` |
+| `signature-query-ecs` | `87.791ms` | `43895.694` |
+| `pooled-data-oriented` | `116.442ms` | `58221.127` |
+| `entity-component` | `131.665ms` | `65832.663` |
+| `archetype-ecs` | `172.208ms` | `86104.161` |
 
 Final normalized snapshot for `large`:
 
-- `live=518`
-- `total=518`
-- `max=1812`
+- `live=793`
+- `total=793`
+- `max=3331`
 - `paddle=1`
-- `ball=10`
-- `brick=317`
-- `particle=0`
-- `trail=190`
+- `ball=19`
+- `brick=316`
+- `particle=96`
+- `trail=361`
 
 ### Xlarge
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `100.872ms` | `50435.957` |
-| `pooled-data-oriented` | `118.228ms` | `59114.145` |
-| `entity-component` | `129.587ms` | `64793.734` |
-| `archetype-ecs` | `188.161ms` | `94080.258` |
+| `signature-query-ecs` | `157.384ms` | `78691.768` |
+| `pooled-data-oriented` | `206.465ms` | `103232.560` |
+| `entity-component` | `222.301ms` | `111150.621` |
+| `archetype-ecs` | `310.580ms` | `155289.794` |
 
-Final normalized snapshot for `xlarge` in `pooled-data-oriented`,
-`entity-component`, and `archetype-ecs`:
+Final normalized snapshot for `xlarge`:
 
-- `live=939`
-- `total=939`
-- `max=2348`
+- `live=1238`
+- `total=1238`
+- `max=4202`
 - `paddle=1`
-- `ball=13`
-- `brick=646`
-- `particle=32`
-- `trail=247`
-
-`signature-query-ecs` diverged at `xlarge` and ended with:
-
-- `live=890`
-- `total=890`
-- `max=2348`
-- `paddle=1`
-- `ball=12`
-- `brick=649`
-- `particle=0`
-- `trail=228`
+- `ball=25`
+- `brick=641`
+- `particle=96`
+- `trail=475`
 
 ### Xxlarge
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `148.699ms` | `74349.383` |
-| `pooled-data-oriented` | `176.532ms` | `88266.227` |
-| `entity-component` | `195.506ms` | `97753.216` |
-| `archetype-ecs` | `275.663ms` | `137831.505` |
+| `signature-query-ecs` | `221.914ms` | `110957.062` |
+| `pooled-data-oriented` | `319.176ms` | `159587.755` |
+| `entity-component` | `335.075ms` | `167537.511` |
+| `archetype-ecs` | `473.674ms` | `236836.877` |
 
 Final normalized snapshot for `xxlarge`:
 
-- `live=1493`
-- `total=1493`
-- `max=2848`
+- `live=1758`
+- `total=1758`
+- `max=4702`
 - `paddle=1`
-- `ball=12`
-- `brick=1124`
-- `particle=128`
-- `trail=228`
+- `ball=27`
+- `brick=1121`
+- `particle=96`
+- `trail=513`
 
 ### Peak Resident Memory
 
@@ -167,19 +155,19 @@ process:
 
 | Implementation | Small | Medium | Large | Xlarge | Xxlarge |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `pooled-data-oriented` | `2532KB` | `2840KB` | `2776KB` | `3360KB` | `3548KB` |
-| `entity-component` | `2504KB` | `2964KB` | `3720KB` | `3608KB` | `4148KB` |
-| `signature-query-ecs` | `2704KB` | `2640KB` | `3084KB` | `3224KB` | `3164KB` |
-| `archetype-ecs` | `3416KB` | `3708KB` | `4348KB` | `4792KB` | `5232KB` |
+| `pooled-data-oriented` | `2700KB` | `4172KB` | `3416KB` | `4184KB` | `4212KB` |
+| `entity-component` | `2568KB` | `4420KB` | `4036KB` | `4932KB` | `4988KB` |
+| `signature-query-ecs` | `2796KB` | `3592KB` | `3468KB` | `3460KB` | `3596KB` |
+| `archetype-ecs` | `3100KB` | `7152KB` | `5672KB` | `6180KB` | `6920KB` |
 
 ### Per-System Highlights
 
-- `signature-query-ecs` stays in front at every tested size by raw runtime
-- `pooled-data-oriented` and `entity-component` remain close, with the gap still smaller than the jump to `archetype-ecs`
+- `signature-query-ecs` stays in front from `medium` upward, while `entity-component` wins the current `small` run
+- `pooled-data-oriented` and `entity-component` remain closer to each other than to `archetype-ecs` at larger sizes
 - `transform2d` and `collide` dominate more of the total cost as the brick grid grows
 - `entity-component` still pays noticeably more in `cleanupDead` than the others
 - `archetype-ecs` is the most memory-hungry implementation in this run
-- `xlarge` is not currently fairness-clean because `signature-query-ecs` diverges from the other three on the final normalized snapshot
+- all five sizes now end with matching normalized snapshots across all four implementations
 
 These numbers are machine-dependent. Treat them as a benchmark snapshot for the
 current code in this repository, not as a universal claim about these
@@ -253,7 +241,7 @@ All implementations are benchmarked under the same rules:
 - identical repetition count
 - identical tick count
 - identical scripted input
-- identical per-repetition RNG seed
+- identical deterministic event-derived randomness
 - identical high-level system order
 - headless execution only
 

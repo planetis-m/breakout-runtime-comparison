@@ -1,5 +1,6 @@
-import std/[math, random]
+import std/math
 from typetraits import supportsCopyMem
+import ../../bench_random
 import ../../bench_sizes
 import ../../shared/[headless_raylib, vmath]
 # ---- archetype ecs runtime ----
@@ -411,8 +412,8 @@ proc addPaddleEntity(game: var Game; translation: Vec2): Entity =
   game.prependChild(game.camera, result)
   game.addActor(result)
 
-proc createBall*(game: var Game; x, y: float32) =
-  let angle = PI.float32 + rand(1.0'f32) * PI.float32
+proc createBall*(game: var Game; x, y: float32; seed: uint32) =
+  let angle = angleFromSeed(seed)
   let entity = game.allocEntity(BallArch)
   game.column(BallArch, TransformC, Transform2d).add(initTransform(vec2(x, y)))
   game.column(BallArch, HierarchyC, Hierarchy).add(initHierarchy())
@@ -510,7 +511,11 @@ proc createScene*(game: var Game; scale: BenchScale) =
 
   game.camera = game.addCamera(vec2(0, 0))
   game.createPaddle(float32(game.windowWidth / 2), float32(game.windowHeight - 30))
-  game.createBall(float32(game.windowWidth / 2), float32(game.windowHeight - 60))
+  game.createBall(
+    float32(game.windowWidth / 2),
+    float32(game.windowHeight - 60),
+    eventSeed(1'u32, 0, float32(game.windowWidth / 2), float32(game.windowHeight - 60))
+  )
 
   for row in 0..<rowCount:
     let y = startingY + row * (brickHeight + margin) + brickHeight div 2
@@ -704,10 +709,13 @@ proc sysControlBrick*(game: var Game) =
     if not brick.dead and game.entityArch(brick.entity) == BrickArch and
         Hit in componentPtr[Collide](game, brick.entity, CollideC)[].collision.flags:
       componentPtr[Fade](game, brick.entity, FadeC)[].step = 0.05
-      if rand(1.0) > 0.98:
+      let position = componentPtr[Transform2d](game, brick.entity, TransformC)[].translation
+      let spawnSeed = eventSeed(2'u32, game.tickId, position.x, position.y)
+      if chanceFromSeed(spawnSeed) > 0.98:
         game.createBall(
           float32(game.windowWidth / 2),
-          float32(game.windowHeight / 2)
+          float32(game.windowHeight / 2),
+          spawnSeed
         )
 
 proc sysShake*(game: var Game) =
@@ -716,12 +724,12 @@ proc sysShake*(game: var Game) =
 
   if shake.duration > 0:
     shake.duration -= 0.01
-    transform.translation.x = shake.strength - rand(shake.strength * 2)
-    transform.translation.y = shake.strength - rand(shake.strength * 2)
+    transform.translation.x = shakeOffsetFromTick(game.tickId, 0, shake.strength)
+    transform.translation.y = shakeOffsetFromTick(game.tickId, 1, shake.strength)
 
-    game.clearColor[0] = rand(255).uint8
-    game.clearColor[1] = rand(255).uint8
-    game.clearColor[2] = rand(255).uint8
+    game.clearColor[0] = shakeColorFromTick(game.tickId, 0)
+    game.clearColor[1] = shakeColorFromTick(game.tickId, 1)
+    game.clearColor[2] = shakeColorFromTick(game.tickId, 2)
     game.markDirty(game.camera)
 
     if shake.duration <= 0:

@@ -1,4 +1,5 @@
-import std/[math, random]
+import std/math
+import ../../bench_random
 import ../../bench_sizes
 import ../../shared/[headless_raylib, vmath]
 # ---- entity-component runtime ----
@@ -121,8 +122,8 @@ proc markDirty*(entity: Entity) =
   if entity != nil:
     entity.transform.flags.incl(Dirty)
 
-proc createBall*(game: var Game; x, y: float32) =
-  let angle = PI.float32 + rand(1.0'f32) * PI.float32
+proc createBall*(game: var Game; x, y: float32; seed: uint32) =
+  let angle = angleFromSeed(seed)
   let entity = game.newEntity(BallKind, game.camera)
   entity.transform.translation = vec2(x, y)
   entity.collide = CollideComponent(
@@ -200,7 +201,11 @@ proc createScene*(game: var Game; scale: BenchScale) =
   game.camera.shake = ShakeComponent(duration: 0, strength: 10)
 
   game.createPaddle(float32(game.windowWidth / 2), float32(game.windowHeight - 30))
-  game.createBall(float32(game.windowWidth / 2), float32(game.windowHeight - 60))
+  game.createBall(
+    float32(game.windowWidth / 2),
+    float32(game.windowHeight - 60),
+    eventSeed(1'u32, 0, float32(game.windowWidth / 2), float32(game.windowHeight - 60))
+  )
 
   for row in 0..<rowCount:
     let y = startingY + row * (brickHeight + margin) + brickHeight div 2
@@ -260,8 +265,10 @@ proc sysControlBrick*(game: var Game) =
     let brick = game.entities[i]
     if brick.alive and brick.kind == BrickKind and Hit in brick.collide.collision.flags:
       brick.fade.step = 0.05
-      if rand(1.0) > 0.98:
-        game.createBall(float32(game.windowWidth / 2), float32(game.windowHeight / 2))
+      let position = brick.transform.translation
+      let spawnSeed = eventSeed(2'u32, game.tickId, position.x, position.y)
+      if chanceFromSeed(spawnSeed) > 0.98:
+        game.createBall(float32(game.windowWidth / 2), float32(game.windowHeight / 2), spawnSeed)
 
 proc sysShake*(game: var Game) =
   if game.camera == nil or game.camera.shake == nil:
@@ -272,11 +279,11 @@ proc sysShake*(game: var Game) =
 
   if shake.duration > 0:
     shake.duration -= 0.01
-    transform.translation.x = shake.strength - rand(shake.strength * 2)
-    transform.translation.y = shake.strength - rand(shake.strength * 2)
-    game.clearColor[0] = rand(255).uint8
-    game.clearColor[1] = rand(255).uint8
-    game.clearColor[2] = rand(255).uint8
+    transform.translation.x = shakeOffsetFromTick(game.tickId, 0, shake.strength)
+    transform.translation.y = shakeOffsetFromTick(game.tickId, 1, shake.strength)
+    game.clearColor[0] = shakeColorFromTick(game.tickId, 0)
+    game.clearColor[1] = shakeColorFromTick(game.tickId, 1)
+    game.clearColor[2] = shakeColorFromTick(game.tickId, 2)
     game.camera.markDirty()
 
     if shake.duration <= 0:
