@@ -8,9 +8,10 @@ It exists to answer a narrow question:
 Which runtime model is faster when the gameplay, update order, input script, and
 simulation rules are held constant?
 
-This repo benchmarks four implementations of the same headless Breakout runtime:
+This repo benchmarks five implementations of the same headless Breakout runtime:
 
 - `pooled-data-oriented`
+- `experimental-dod`
 - `entity-component`
 - `archetype-ecs`
 - `signature-query-ecs`
@@ -52,12 +53,13 @@ Latest local run with the default suite configuration:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `pooled-data-oriented` | `51.225ms` | `25612.414` |
-| `signature-query-ecs` | `51.453ms` | `25726.391` |
-| `entity-component` | `64.940ms` | `32470.090` |
-| `archetype-ecs` | `78.701ms` | `39350.586` |
+| `experimental-dod` | `29.623ms` | `14811.470` |
+| `pooled-data-oriented` | `50.882ms` | `25440.981` |
+| `signature-query-ecs` | `51.505ms` | `25752.540` |
+| `entity-component` | `62.704ms` | `31352.137` |
+| `archetype-ecs` | `77.453ms` | `38726.291` |
 
-Final normalized snapshot for `small`:
+Final normalized snapshot for the fairness-matched runtimes at `small`:
 
 - `live=593`
 - `total=593`
@@ -68,16 +70,28 @@ Final normalized snapshot for `small`:
 - `particle=224`
 - `trail=266`
 
+`experimental-dod` diverged in this run:
+
+- `live=371`
+- `total=371`
+- `max=4482`
+- `paddle=1`
+- `ball=14`
+- `brick=90`
+- `particle=0`
+- `trail=266`
+
 ### Medium
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `87.540ms` | `43770.102` |
-| `pooled-data-oriented` | `111.859ms` | `55929.694` |
-| `entity-component` | `134.969ms` | `67484.423` |
-| `archetype-ecs` | `183.646ms` | `91822.955` |
+| `experimental-dod` | `49.095ms` | `24547.487` |
+| `signature-query-ecs` | `92.504ms` | `46251.959` |
+| `pooled-data-oriented` | `112.585ms` | `56292.702` |
+| `entity-component` | `122.741ms` | `61370.365` |
+| `archetype-ecs` | `164.093ms` | `82046.748` |
 
-Final normalized snapshot for `medium`:
+Final normalized snapshot for the fairness-matched runtimes at `medium`:
 
 - `live=793`
 - `total=793`
@@ -88,16 +102,28 @@ Final normalized snapshot for `medium`:
 - `particle=96`
 - `trail=361`
 
+`experimental-dod` diverged in this run:
+
+- `live=636`
+- `total=636`
+- `max=3331`
+- `paddle=1`
+- `ball=16`
+- `brick=315`
+- `particle=0`
+- `trail=304`
+
 ### Large
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `198.611ms` | `99305.367` |
-| `pooled-data-oriented` | `255.016ms` | `127508.247` |
-| `entity-component` | `304.912ms` | `152456.059` |
-| `archetype-ecs` | `396.528ms` | `198263.831` |
+| `experimental-dod` | `110.021ms` | `55010.643` |
+| `signature-query-ecs` | `216.685ms` | `108342.344` |
+| `pooled-data-oriented` | `248.319ms` | `124159.567` |
+| `entity-component` | `289.481ms` | `144740.725` |
+| `archetype-ecs` | `391.245ms` | `195622.589` |
 
-Final normalized snapshot for `large`:
+Final normalized snapshot for the fairness-matched runtimes at `large`:
 
 - `live=1458`
 - `total=1458`
@@ -108,14 +134,26 @@ Final normalized snapshot for `large`:
 - `particle=96`
 - `trail=513`
 
+`experimental-dod` diverged in this run:
+
+- `live=1327`
+- `total=1327`
+- `max=4402`
+- `paddle=1`
+- `ball=24`
+- `brick=814`
+- `particle=32`
+- `trail=456`
+
 ### Xlarge
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `299.262ms` | `149631.006` |
-| `pooled-data-oriented` | `401.334ms` | `200666.891` |
-| `entity-component` | `414.899ms` | `207449.727` |
-| `archetype-ecs` | `701.989ms` | `350994.705` |
+| `experimental-dod` | `204.726ms` | `102363.178` |
+| `signature-query-ecs` | `323.905ms` | `161952.634` |
+| `pooled-data-oriented` | `380.067ms` | `190033.361` |
+| `entity-component` | `448.429ms` | `224214.663` |
+| `archetype-ecs` | `687.179ms` | `343589.579` |
 
 Final normalized snapshot for `xlarge`:
 
@@ -132,10 +170,11 @@ Final normalized snapshot for `xlarge`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `signature-query-ecs` | `427.762ms` | `213881.131` |
-| `pooled-data-oriented` | `571.237ms` | `285618.291` |
-| `entity-component` | `626.676ms` | `313338.203` |
-| `archetype-ecs` | `973.466ms` | `486732.909` |
+| `experimental-dod` | `315.826ms` | `157913.025` |
+| `signature-query-ecs` | `420.378ms` | `210189.115` |
+| `pooled-data-oriented` | `570.333ms` | `285166.328` |
+| `entity-component` | `627.400ms` | `313699.923` |
+| `archetype-ecs` | `1006.844ms` | `503421.903` |
 
 Final normalized snapshot for `xxlarge`:
 
@@ -155,19 +194,20 @@ process:
 
 | Implementation | Small | Medium | Large | Xlarge | Xxlarge |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `pooled-data-oriented` | `4044KB` | `3572KB` | `4300KB` | `4056KB` | `4636KB` |
-| `entity-component` | `4536KB` | `4088KB` | `4864KB` | `6200KB` | `6328KB` |
-| `signature-query-ecs` | `4364KB` | `4076KB` | `4368KB` | `4752KB` | `5508KB` |
-| `archetype-ecs` | `7148KB` | `5408KB` | `6444KB` | `7072KB` | `8224KB` |
+| `pooled-data-oriented` | `4212KB` | `3572KB` | `4172KB` | `4116KB` | `4748KB` |
+| `experimental-dod` | `4360KB` | `3780KB` | `4220KB` | `4420KB` | `4612KB` |
+| `entity-component` | `4496KB` | `3892KB` | `4740KB` | `6268KB` | `6152KB` |
+| `signature-query-ecs` | `4340KB` | `3972KB` | `4612KB` | `4868KB` | `5328KB` |
+| `archetype-ecs` | `7208KB` | `5408KB` | `6592KB` | `6956KB` | `8224KB` |
 
 ### Per-System Highlights
 
-- `pooled-data-oriented` narrowly wins the current `small` run, but `signature-query-ecs` is fastest from `medium` upward
-- `pooled-data-oriented` and `entity-component` remain closer to each other than to `archetype-ecs` at larger sizes
+- `experimental-dod` is the fastest implementation in this run at every tested size
+- `experimental-dod` matches the other runtimes at `xlarge` and `xxlarge`, but diverges at `small`, `medium`, and `large`
+- among the fairness-matched runtimes, `signature-query-ecs` is the fastest at `medium` through `xxlarge`
 - `transform2d` and `collide` dominate more of the total cost as the brick grid grows
 - `entity-component` still pays noticeably more in `cleanupDead` than the others
-- `archetype-ecs` is the most memory-hungry implementation in this run
-- all five sizes now end with matching normalized snapshots across all four implementations
+- `archetype-ecs` remains the most memory-hungry implementation in this run
 
 These numbers are machine-dependent. Treat them as a benchmark snapshot for the
 current code in this repository, not as a universal claim about these
@@ -179,6 +219,12 @@ architectures.
 
 Concrete actor records with typed component indices and explicit pool-backed
 storage.
+
+### `experimental-dod`
+
+Dense per-kind stores with a shared transform hierarchy service. This variant is
+intentionally more game-shaped and more directly data-oriented than the pooled
+baseline.
 
 ### `entity-component`
 
@@ -199,15 +245,18 @@ Signature-mask ECS with slot tables and query-style iteration.
 breakout-runtime-comparison/
 ├── bench_sizes.nim
 ├── common.nim
+├── bench_random.nim
 ├── shared/
 │   ├── headless_raylib.nim
 │   └── vmath.nim
 ├── implementations/
 │   ├── pooled_data_oriented/runtime.nim
+│   ├── experimental_dod/runtime.nim
 │   ├── entity_component/runtime.nim
 │   ├── archetype_ecs/runtime.nim
 │   └── signature_query_ecs/runtime.nim
 ├── run_data_oriented.nim
+├── run_experimental_dod.nim
 ├── run_entity_component.nim
 ├── run_archetype_ecs.nim
 ├── run_legacy_signature_ecs.nim
