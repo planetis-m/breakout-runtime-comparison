@@ -1,0 +1,5 @@
+.nimcache/
+run_data_oriented
+run_entity_component
+run_archetype_ecs
+run_legacy_signature_ecs

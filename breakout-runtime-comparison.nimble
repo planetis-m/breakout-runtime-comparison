@@ -1,0 +1,5 @@
+version       = "0.1.0"
+author        = "Local Benchmark Harness"
+description   = "Standalone runtime comparison repo for the breakout simulation"
+license       = "MIT"
+srcDir        = "."
