@@ -45,13 +45,13 @@ run_benchmark_suite() {
 }
 
 nim c --threads:on -d:release --nimcache:"$BENCH_ROOT/.nimcache/data_oriented" "$BENCH_ROOT/run_data_oriented.nim"
-nim c --threads:on -d:release --nimcache:"$BENCH_ROOT/.nimcache/experimental_dod" "$BENCH_ROOT/run_experimental_dod.nim"
+nim c --threads:on -d:release --nimcache:"$BENCH_ROOT/.nimcache/pure_dod" "$BENCH_ROOT/run_pure_dod.nim"
 nim c --threads:on -d:release --nimcache:"$BENCH_ROOT/.nimcache/entity_component" "$BENCH_ROOT/run_entity_component.nim"
 nim c --threads:on -d:release --nimcache:"$BENCH_ROOT/.nimcache/archetype_ecs" "$BENCH_ROOT/run_archetype_ecs.nim"
 nim c --threads:on -d:release --nimcache:"$BENCH_ROOT/.nimcache/signature_query_ecs" "$BENCH_ROOT/run_legacy_signature_ecs.nim"
 
 run_benchmark_suite "pooled-data-oriented" "$BENCH_ROOT/run_data_oriented"
-run_benchmark_suite "experimental-dod" "$BENCH_ROOT/run_experimental_dod"
+run_benchmark_suite "pure-dod" "$BENCH_ROOT/run_pure_dod"
 run_benchmark_suite "entity-component" "$BENCH_ROOT/run_entity_component"
 run_benchmark_suite "archetype-ecs" "$BENCH_ROOT/run_archetype_ecs"
 run_benchmark_suite "signature-query-ecs" "$BENCH_ROOT/run_legacy_signature_ecs"

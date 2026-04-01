@@ -11,7 +11,7 @@ simulation rules are held constant?
 This repo benchmarks five implementations of the same headless Breakout runtime:
 
 - `pooled-data-oriented`
-- `experimental-dod`
+- `pure-dod`
 - `entity-component`
 - `archetype-ecs`
 - `signature-query-ecs`
@@ -53,7 +53,7 @@ Latest local run with the default suite configuration:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `experimental-dod` | `29.623ms` | `14811.470` |
+| `pure-dod` | `29.623ms` | `14811.470` |
 | `pooled-data-oriented` | `50.882ms` | `25440.981` |
 | `signature-query-ecs` | `51.505ms` | `25752.540` |
 | `entity-component` | `62.704ms` | `31352.137` |
@@ -70,7 +70,7 @@ Final normalized snapshot for the fairness-matched runtimes at `small`:
 - `particle=224`
 - `trail=266`
 
-`experimental-dod` diverged in this run:
+`pure-dod` diverged in this run:
 
 - `live=371`
 - `total=371`
@@ -85,7 +85,7 @@ Final normalized snapshot for the fairness-matched runtimes at `small`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `experimental-dod` | `49.095ms` | `24547.487` |
+| `pure-dod` | `49.095ms` | `24547.487` |
 | `signature-query-ecs` | `92.504ms` | `46251.959` |
 | `pooled-data-oriented` | `112.585ms` | `56292.702` |
 | `entity-component` | `122.741ms` | `61370.365` |
@@ -102,7 +102,7 @@ Final normalized snapshot for the fairness-matched runtimes at `medium`:
 - `particle=96`
 - `trail=361`
 
-`experimental-dod` diverged in this run:
+`pure-dod` diverged in this run:
 
 - `live=636`
 - `total=636`
@@ -117,7 +117,7 @@ Final normalized snapshot for the fairness-matched runtimes at `medium`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `experimental-dod` | `110.021ms` | `55010.643` |
+| `pure-dod` | `110.021ms` | `55010.643` |
 | `signature-query-ecs` | `216.685ms` | `108342.344` |
 | `pooled-data-oriented` | `248.319ms` | `124159.567` |
 | `entity-component` | `289.481ms` | `144740.725` |
@@ -134,7 +134,7 @@ Final normalized snapshot for the fairness-matched runtimes at `large`:
 - `particle=96`
 - `trail=513`
 
-`experimental-dod` diverged in this run:
+`pure-dod` diverged in this run:
 
 - `live=1327`
 - `total=1327`
@@ -149,7 +149,7 @@ Final normalized snapshot for the fairness-matched runtimes at `large`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `experimental-dod` | `204.726ms` | `102363.178` |
+| `pure-dod` | `204.726ms` | `102363.178` |
 | `signature-query-ecs` | `323.905ms` | `161952.634` |
 | `pooled-data-oriented` | `380.067ms` | `190033.361` |
 | `entity-component` | `448.429ms` | `224214.663` |
@@ -170,7 +170,7 @@ Final normalized snapshot for `xlarge`:
 
 | Implementation | Avg total | Ns/tick |
 | --- | ---: | ---: |
-| `experimental-dod` | `315.826ms` | `157913.025` |
+| `pure-dod` | `315.826ms` | `157913.025` |
 | `signature-query-ecs` | `420.378ms` | `210189.115` |
 | `pooled-data-oriented` | `570.333ms` | `285166.328` |
 | `entity-component` | `627.400ms` | `313699.923` |
@@ -195,15 +195,15 @@ process:
 | Implementation | Small | Medium | Large | Xlarge | Xxlarge |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | `pooled-data-oriented` | `4212KB` | `3572KB` | `4172KB` | `4116KB` | `4748KB` |
-| `experimental-dod` | `4360KB` | `3780KB` | `4220KB` | `4420KB` | `4612KB` |
+| `pure-dod` | `4360KB` | `3780KB` | `4220KB` | `4420KB` | `4612KB` |
 | `entity-component` | `4496KB` | `3892KB` | `4740KB` | `6268KB` | `6152KB` |
 | `signature-query-ecs` | `4340KB` | `3972KB` | `4612KB` | `4868KB` | `5328KB` |
 | `archetype-ecs` | `7208KB` | `5408KB` | `6592KB` | `6956KB` | `8224KB` |
 
 ### Per-System Highlights
 
-- `experimental-dod` is the fastest implementation in this run at every tested size
-- `experimental-dod` matches the other runtimes at `xlarge` and `xxlarge`, but diverges at `small`, `medium`, and `large`
+- `pure-dod` is the fastest implementation in this run at every tested size
+- `pure-dod` matches the other runtimes at `xlarge` and `xxlarge`, but diverges at `small`, `medium`, and `large`
 - among the fairness-matched runtimes, `signature-query-ecs` is the fastest at `medium` through `xxlarge`
 - `transform2d` and `collide` dominate more of the total cost as the brick grid grows
 - `entity-component` still pays noticeably more in `cleanupDead` than the others
@@ -220,7 +220,7 @@ architectures.
 Concrete actor records with typed component indices and explicit pool-backed
 storage.
 
-### `experimental-dod`
+### `pure-dod`
 
 Dense per-kind stores with a shared transform hierarchy service. This variant is
 intentionally more game-shaped and more directly data-oriented than the pooled
@@ -251,12 +251,12 @@ breakout-runtime-comparison/
 │   └── vmath.nim
 ├── implementations/
 │   ├── pooled_data_oriented/runtime.nim
-│   ├── experimental_dod/runtime.nim
+│   ├── pure_dod/runtime.nim
 │   ├── entity_component/runtime.nim
 │   ├── archetype_ecs/runtime.nim
 │   └── signature_query_ecs/runtime.nim
 ├── run_data_oriented.nim
-├── run_experimental_dod.nim
+├── run_pure_dod.nim
 ├── run_entity_component.nim
 ├── run_archetype_ecs.nim
 ├── run_legacy_signature_ecs.nim

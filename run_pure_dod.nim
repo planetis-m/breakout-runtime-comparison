@@ -1,5 +1,5 @@
 import ./common
-import ./implementations/experimental_dod/runtime
+import ./implementations/pure_dod/runtime
 
 type
   BenchGame = Game
@@ -53,7 +53,7 @@ proc snapshot(game: BenchGame): Snapshot =
 
 when isMainModule:
   benchmarkMain(
-    "experimental-dod",
+    "pure-dod",
     initBenchGame,
     createScene,
     applyInput,
